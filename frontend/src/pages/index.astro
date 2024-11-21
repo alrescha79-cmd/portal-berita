@@ -1,0 +1,43 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogRecentCard from "@components/blog/BlogRecentCard.astro";
+import MainSection from "@components/ui/sections/MainSection.astro";
+import { SITE } from "@/config";
+
+const response = await fetch(`${import.meta.env.HOST}/news`);
+const result = await response.json();
+const posts = result.data || []; // Ambil data dari API
+
+const description = "Berita Terbaru";
+const URL = Astro.url.href;
+---
+
+<BaseLayout
+    title="Berita Terbaru"
+    description={description}
+    structuredData={{
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "inLanguage": "en-US",
+        "@id": URL,
+        "url": URL,
+        "name": `Berita Terbaru - ${SITE.title}`,
+        "description": description,
+        "isPartOf": {
+            "@type": "WebSite",
+            "url": SITE.url,
+            "name": SITE.title,
+            "description": SITE.description,
+        },
+    }}
+>
+    <MainSection
+        title="Baca Selengkapnya"
+        subTitle="Baca Selengkapnya"
+        btnExists={true}
+        btnTitle="All Posts"
+        btnURL="/timeline"
+    />
+
+    <BlogRecentCard blogs={posts} />
+</BaseLayout>

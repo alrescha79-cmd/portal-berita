@@ -1,0 +1,112 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogComments from "@components/blog/BlogComments";
+import { timeago } from "@support/time";
+import { SITE, Settings } from "@/config";
+
+async function fetchNewsBySlug(slug: string | number | boolean | undefined) {
+    const response = await fetch(`${import.meta.env.HOST}/news/${encodeURIComponent(slug)}`);
+    const data = await response.json();
+    return data.data;
+}
+
+const { slug } = Astro.params;
+const post = await fetchNewsBySlug(slug);
+
+if (!post) {
+    throw new Error("Post not found");
+}
+
+const formattedPubDate = post.pubDate && post.pubDate._seconds
+    ? new Date(post.pubDate._seconds * 1000).toISOString()
+    : post.pubDate;
+
+const bannerImage = post.banner || post.thumbnailURL;
+const category = post.category;
+const tags = post.tags ?? [category];
+const URL = Astro.url.href;
+const ogImage = bannerImage;
+---
+
+<BaseLayout
+    title={post.title}
+    description={post.description}
+    ogImage={ogImage}
+    structuredData={{
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "@id": URL,
+        "url": URL,
+        "description": post.description,
+        "image": [ogImage],
+        "headline": post.title,
+        "datePublished": formattedPubDate,
+        "dateModified": formattedPubDate,
+        "author": [
+            {
+                "@type": "Person",
+                "name": SITE.author,
+                "url": SITE.url,
+            },
+        ],
+    }}
+>
+    <section class="mx-auto max-w-6xl px-4 pb-12 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+        <div class="shadow-none sm:shadow-sm mt-4 sm:mt-0">
+            <div class="max-w-6xl">
+                <img
+                    class="w-full object-cover rounded-tl-sm rounded-tr-sm"
+                    src={bannerImage}
+                    alt={post.title}
+                    draggable="false"
+                    loading="lazy"
+                />
+            </div>
+            <div class="sm:dark:bg-neutral-900/30 sm:bg-neutral-100 px-0 sm:px-6 md:px-10 lg:px-14 py-6">
+                <div class="mb-10">
+                    <h2 class="block text-balance text-3xl font-bold tracking-tight text-neutral-800 dark:text-neutral-300 md:text-4xl lg:text-5xl">
+                        {post.title}
+                    </h2>
+                    <ol class="flex items-center whitespace-nowrap mt-2">
+                        <li class="inline-flex items-center">
+                            <a class="flex items-center text-sm text-orange-400 hover:text-orange-500 focus:outline-none focus:text-orange-500" href={`/categories/${category}`}>
+                                {category}
+                            </a>
+                            <svg class="flex-shrink-0 size-5 text-neutral-500 dark:text-neutral-600 mx-2" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                            </svg>
+                        </li>
+                        <li class="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-400 dark:focus:text-neutral-400">
+                            {timeago(formattedPubDate)}
+                            <svg class="flex-shrink-0 size-5 text-neutral-500 dark:text-neutral-600 mx-2" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M6 13L10 3" stroke="currentColor" stroke-linecap="round"></path>
+                            </svg>
+                        </li>
+                        <li class="inline-flex items-center text-sm text-neutral-500 hover:text-neutral-600 focus:outline-none focus:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-400 dark:focus:text-neutral-400" aria-current="page">
+                            {post.minutesRead}
+                        </li>
+                    </ol>
+                </div>
+
+                <article class="prose prose-blog sm:prose-lg dark:prose-invert max-w-none" set:html={post.content} />
+
+                <div class="mt-10 md:mt-14 mx-auto grid max-w-screen-lg gap-y-5 sm:flex sm:items-center sm:justify-between sm:gap-y-0">
+                    <div class="flex flex-wrap gap-x-2 gap-y-1 sm:flex-nowrap sm:items-center sm:gap-y-0">
+                        {tags.map((tag: unknown) => (
+                            <span class="inline-flex items-center gap-x-1.5 rounded-lg bg-neutral-400/30 px-3 py-1.5 text-xs font-medium text-neutral-700 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring dark:bg-neutral-700/60 dark:text-neutral-300">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {Settings.Comment.enable && <div class="my-10"><BlogComments client:only="react" /></div>}
+    </section>
+    <style is:inline>
+        html.dark .astro-code, html.dark .astro-code span {
+            color: var(--shiki-dark) !important;
+            background-color: var(--shiki-dark-bg) !important;
+        }
+    </style>
+</BaseLayout>

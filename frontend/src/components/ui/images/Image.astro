@@ -1,0 +1,35 @@
+---
+import { Image } from "astro:assets";
+import { type ImageMetadata } from "astro";
+import { blurStyle } from "@support/image";
+
+const props = Astro.props;
+
+interface FsPathImage extends ImageMetadata {
+    fsPath?: string;
+}
+
+const image = props.src as FsPathImage;
+const showBlur = !props.disableBlur;
+
+// Jika gambar lokal, gunakan blur CSS dari `blurStyle`, jika URL, gunakan CSS langsung
+const blurCSS = image.fsPath && showBlur ? await blurStyle(image.fsPath) : { filter: "blur(10px)", transition: "filter 0.3s ease" };
+---
+
+{
+    image.fsPath
+    ? (
+        // Untuk gambar lokal menggunakan fsPath
+        <Image {...props} style={blurCSS} />
+    )
+    : (
+        // Untuk gambar dari URL eksternal
+        <img
+            src={props.src}
+            alt={props.alt}
+            {...props}
+            style={blurCSS}
+            onload="this.style.filter='blur(0)'"
+        />
+    )
+}

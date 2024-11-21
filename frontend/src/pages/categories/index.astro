@@ -1,0 +1,119 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogCategory from "@components/blog/BlogCategory.astro";
+import MainSection from "@components/ui/sections/MainSection.astro";
+import { SITE } from "@/config";
+
+function toDate(input: string | number | Date) {
+    // eslint-disable-next-line style/max-statements-per-line
+    if (input instanceof Date) { return input; }
+
+    if (typeof input !== "string" && typeof input !== "number") {
+        console.warn("Invalid date input:", input);
+        return new Date();
+    }
+
+    if (!Number.isNaN(input) || /^\d+$/.test(input.toString())) {
+        return new Date(Number.parseInt(input.toString()));
+    }
+
+    input = (input || "")
+        .toString()
+        .trim()
+        .replace(/\.\d+/, "")
+        .replace(/-/, "/")
+        .replace(/-/, "/")
+        .replace(/(\d)T(\d)/, "$1 $2")
+        .replace(/Z/, " UTC")
+        .replace(/([+-]\d\d):?(\d\d)/, " $1$2");
+    return new Date(input);
+}
+
+async function fetchNewsData() {
+    const response = await fetch(`${import.meta.env.HOST}/news`);
+    const data = await response.json();
+    return data.data;
+}
+
+interface NewsCategory {
+    category: string;
+    newsCount: number;
+    latestDate: string | number | Date;
+}
+
+let groupedData: { [key: string]: NewsCategory } = {};
+
+try {
+    const data = await fetchNewsData();
+    groupedData = data.reduce((acc: { [x: string]: {
+        [x: string]: number;
+latestDate: any;
+}; }, news: { category: any; createdAt: any }) => {
+        const category = news.category;
+        if (!acc[category]) {
+            acc[category] = {
+                category,
+                newsCount: 0,
+                latestDate: news.createdAt,
+            };
+        }
+        acc[category].newsCount += 1;
+        if (toDate(news.createdAt) > toDate(acc[category].latestDate)) {
+            acc[category].latestDate = news.createdAt;
+        }
+        return acc;
+    }, {});
+}
+ catch (error) {
+    console.error("Error fetching data:", error);
+}
+
+const uniqueData = Object.values(groupedData);
+
+const description = "Here are some categories that Godruoyi is interested in.";
+const URL = Astro.url.href;
+---
+
+<BaseLayout
+    title="All Categories"
+    description={description}
+    structuredData={{
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "inLanguage": "en-US",
+        "@id": URL,
+        "url": URL,
+        "name": `All Categories - ${SITE.title}`,
+        "description": description,
+        "isPartOf": {
+            "@type": "WebSite",
+            "url": SITE.url,
+            "name": SITE.title,
+            "description": SITE.description,
+        },
+    }}
+>
+    <MainSection title="Categories" subTitle={description} />
+
+    <section
+        class="mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:pt-10 lg:py-14 2xl:max-w-full"
+    >
+        <div
+            class="grid sm:grid-cols-2 lg:grid-cols-3 items-center gap-6 md:gap-10"
+        >
+            {
+                uniqueData.map(item => (
+                    <BlogCategory
+                        slug={`${item.category}`}
+                        title={item.category}
+                        description={`Total news: ${item.newsCount}`}
+                        count={item.newsCount}
+                        publishDate={toDate(
+                            item.latestDate,
+                        ).toLocaleDateString()}
+                    />
+                ))
+            }
+        </div>
+    </section>
+</BaseLayout>
