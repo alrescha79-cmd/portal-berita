@@ -123,7 +123,7 @@ Proyek ini merupakan sebuah portal berita fullstack yang dibangun menggunakan te
         * Jalankan Project
 
      ```bash
-     npm run dev
+     npm start
      ```
 
      * Secara default, Server akan berjalan pada <http://localhost:5000>
@@ -154,7 +154,7 @@ Proyek ini merupakan sebuah portal berita fullstack yang dibangun menggunakan te
         * Jalankan Project
 
         ```bash
-        npm run dev
+        npm start
         ```
 
         * Secara default, Server akan berjalan pada <http://localhost:4321>
