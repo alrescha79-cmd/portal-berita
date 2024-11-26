@@ -162,13 +162,9 @@ Proyek ini merupakan sebuah portal berita fullstack yang dibangun menggunakan te
     ##
 
 4. **Testing API:**
-   * Gunakan Postman collection yang disediakan untuk menguji API backend.
+   * Gunakan `postman collection`berikut untuk testing API pada `backend`
 
-## Postman Collection
-
-Gunakan `postman collection`berikut untuk testing API pada `backend`
-
-[Project_Internship_Winnicode.postman_collection.json](https://drive.google.com/file/d/1SXqXUH2vUllWS_WblsGCDuXjHIjtUS5A/view?usp=drive_link)
+      [Project_Internship_Winnicode.postman_collection.json](https://drive.google.com/file/d/1SXqXUH2vUllWS_WblsGCDuXjHIjtUS5A/view?usp=drive_link)
 
 ### **Struktur Direktori**
 
@@ -189,7 +185,7 @@ portal-berita
 
 ### **Demo**
 
-* **Link API:** [https://winnicode-165414826026.asia-southeast2.run.app](https://news-app-api-165414826026.asia-southeast2.run.app)
+* **Link API:** [https://news-app-api-165414826026.asia-southeast2.run.app](https://news-app-api-165414826026.asia-southeast2.run.app)
 * **Link Berita:** [https://winnicode-165414826026.asia-southeast2.run.app](https://winnicode-165414826026.asia-southeast2.run.app)
 * **Link Dashborad:** [https://news-app-dashboard-165414826026.asia-southeast2.run.app](https://news-app-dashboard-165414826026.asia-southeast2.run.app)
 
@@ -221,6 +217,6 @@ Kontribusi sangat diapresiasi! Silahkan buat pull request jika Anda ingin menamb
 ## **Repository utama**
 
 > [!NOTE]  
-> Semua riwayat dan Commit.
+> Ini  adalah repository `kedua`. Repository utama dibawah:
 
 [https://github.com/alrescha79-cmd/project-internship-winnicode-fullstack](https://github.com/alrescha79-cmd/project-internship-winnicode-fullstack)
